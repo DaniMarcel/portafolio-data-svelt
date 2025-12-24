@@ -67,68 +67,46 @@
     regionChartEl.appendChild(plot);
   }
 
-  // Gráfico de dona - Denuncias por ámbito
+  // Gráfico de barras horizontales - Denuncias por ámbito
   function createAmbitoChart() {
-    const width = 350;
-    const height = 350;
-    const radius = Math.min(width, height) / 2 - 20;
-
-    const svg = d3
-      .select(ambitoChartEl)
-      .html("")
-      .append("svg")
-      .attr("width", width)
-      .attr("height", height)
-      .append("g")
-      .attr("transform", `translate(${width / 2}, ${height / 2})`);
-
-    const pie = d3
-      .pie<any>()
-      .value((d) => d.total)
-      .sort(null);
-
-    const arc = d3
-      .arc<any>()
-      .innerRadius(radius * 0.5)
-      .outerRadius(radius);
-
-    const arcs = svg
-      .selectAll("arc")
-      .data(pie(denunciasPorAmbito))
-      .enter()
-      .append("g");
-
-    arcs
-      .append("path")
-      .attr("d", arc)
-      .attr("fill", (d) => coloresAmbito[d.data.ambito] || "#6b7280")
-      .attr("stroke", "#1a1a2e")
-      .attr("stroke-width", 2)
-      .style("cursor", "pointer")
-      .on("mouseenter", function () {
-        d3.select(this).transition().duration(150).attr("opacity", 0.8);
-      })
-      .on("mouseleave", function () {
-        d3.select(this).transition().duration(150).attr("opacity", 1);
-      });
-
-    // Texto central
-    svg
-      .append("text")
-      .attr("text-anchor", "middle")
-      .attr("dy", "-0.5em")
-      .style("fill", "white")
-      .style("font-size", "2rem")
-      .style("font-weight", "700")
-      .text(resumenGeneral.totalDenuncias.toLocaleString());
-
-    svg
-      .append("text")
-      .attr("text-anchor", "middle")
-      .attr("dy", "1.5em")
-      .style("fill", "rgba(255,255,255,0.6)")
-      .style("font-size", "0.9rem")
-      .text("Total denuncias");
+    const plot = Plot.plot({
+      marginLeft: 150,
+      marginRight: 60,
+      height: 260,
+      style: {
+        background: "transparent",
+        color: "white",
+        fontSize: "12px",
+      },
+      x: {
+        label: "% de denuncias",
+        grid: true,
+        tickFormat: (d: number) => `${d}%`,
+      },
+      y: {
+        label: null,
+      },
+      marks: [
+        Plot.barX(denunciasPorAmbito, {
+          y: "ambito",
+          x: "porcentaje",
+          fill: (d) => coloresAmbito[d.ambito] || "#8b5cf6",
+          sort: { y: "x", reverse: true },
+          tip: true,
+        }),
+        Plot.text(denunciasPorAmbito, {
+          y: "ambito",
+          x: "porcentaje",
+          text: (d) => `${d.porcentaje}%`,
+          dx: 25,
+          fill: "white",
+          fontSize: 11,
+        }),
+        Plot.ruleX([0]),
+      ],
+    });
+    ambitoChartEl.innerHTML = "";
+    ambitoChartEl.appendChild(plot);
   }
 
   // Gráfico de barras - Top temas
@@ -167,65 +145,53 @@
     temaChartEl.appendChild(plot);
   }
 
-  // Gráfico de dona - Estados
+  // Gráfico de barras horizontales - Estados
   function createEstadoChart() {
-    const width = 280;
-    const height = 280;
-    const radius = Math.min(width, height) / 2 - 10;
+    // Calcular porcentajes
+    const dataConPorcentaje = denunciasPorEstado.map((d) => ({
+      ...d,
+      porcentaje: parseFloat(
+        ((d.total / resumenGeneral.totalDenuncias) * 100).toFixed(1)
+      ),
+    }));
 
-    const svg = d3
-      .select(estadoChartEl)
-      .html("")
-      .append("svg")
-      .attr("width", width)
-      .attr("height", height)
-      .append("g")
-      .attr("transform", `translate(${width / 2}, ${height / 2})`);
-
-    const pie = d3
-      .pie<any>()
-      .value((d) => d.total)
-      .sort(null);
-
-    const arc = d3
-      .arc<any>()
-      .innerRadius(radius * 0.6)
-      .outerRadius(radius);
-
-    const arcs = svg
-      .selectAll("arc")
-      .data(pie(denunciasPorEstado))
-      .enter()
-      .append("g");
-
-    arcs
-      .append("path")
-      .attr("d", arc)
-      .attr("fill", (d) => coloresEstado[d.data.estado] || "#6b7280")
-      .attr("stroke", "#1a1a2e")
-      .attr("stroke-width", 2);
-
-    // Porcentaje cerradas en el centro
-    const porcentajeCerradas = (
-      (resumenGeneral.denunciasCerradas / resumenGeneral.totalDenuncias) *
-      100
-    ).toFixed(0);
-    svg
-      .append("text")
-      .attr("text-anchor", "middle")
-      .attr("dy", "-0.3em")
-      .style("fill", "#22c55e")
-      .style("font-size", "1.8rem")
-      .style("font-weight", "700")
-      .text(`${porcentajeCerradas}%`);
-
-    svg
-      .append("text")
-      .attr("text-anchor", "middle")
-      .attr("dy", "1.2em")
-      .style("fill", "rgba(255,255,255,0.6)")
-      .style("font-size", "0.8rem")
-      .text("Cerradas");
+    const plot = Plot.plot({
+      marginLeft: 100,
+      marginRight: 60,
+      height: 180,
+      style: {
+        background: "transparent",
+        color: "white",
+        fontSize: "12px",
+      },
+      x: {
+        label: "Cantidad",
+        grid: true,
+      },
+      y: {
+        label: null,
+      },
+      marks: [
+        Plot.barX(dataConPorcentaje, {
+          y: "estado",
+          x: "total",
+          fill: (d) => coloresEstado[d.estado] || "#8b5cf6",
+          sort: { y: "x", reverse: true },
+          tip: true,
+        }),
+        Plot.text(dataConPorcentaje, {
+          y: "estado",
+          x: "total",
+          text: (d) => `${d.porcentaje}%`,
+          dx: 30,
+          fill: "white",
+          fontSize: 11,
+        }),
+        Plot.ruleX([0]),
+      ],
+    });
+    estadoChartEl.innerHTML = "";
+    estadoChartEl.appendChild(plot);
   }
 
   // Gráfico de líneas - Tendencia mensual
@@ -339,37 +305,15 @@
     <!-- Denuncias por ámbito -->
     <section class="chart-section" in:fly={{ y: 20, delay: 300 }}>
       <h2>📁 Por Ámbito</h2>
-      <div class="chart-container donut" bind:this={ambitoChartEl}></div>
-      <div class="legend">
-        {#each denunciasPorAmbito as item}
-          <div class="legend-item">
-            <span
-              class="legend-color"
-              style="background: {coloresAmbito[item.ambito]}"
-            ></span>
-            <span class="legend-text">{item.ambito}</span>
-            <span class="legend-value">{item.porcentaje}%</span>
-          </div>
-        {/each}
-      </div>
+      <p class="chart-description">Clasificación por tipo de problemática</p>
+      <div class="chart-container" bind:this={ambitoChartEl}></div>
     </section>
 
     <!-- Denuncias por estado -->
     <section class="chart-section" in:fly={{ y: 20, delay: 350 }}>
       <h2>📊 Por Estado</h2>
-      <div class="chart-container donut" bind:this={estadoChartEl}></div>
-      <div class="legend">
-        {#each denunciasPorEstado as item}
-          <div class="legend-item">
-            <span
-              class="legend-color"
-              style="background: {coloresEstado[item.estado]}"
-            ></span>
-            <span class="legend-text">{item.estado}</span>
-            <span class="legend-value">{item.total.toLocaleString()}</span>
-          </div>
-        {/each}
-      </div>
+      <p class="chart-description">Estado actual de las denuncias</p>
+      <div class="chart-container" bind:this={estadoChartEl}></div>
     </section>
 
     <!-- Tendencia mensual -->
@@ -579,40 +523,6 @@
     width: 100%;
     display: flex;
     justify-content: center;
-  }
-
-  .chart-container.donut {
-    margin: 1rem 0;
-  }
-
-  /* Legend */
-  .legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    justify-content: center;
-    margin-top: 1rem;
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.8rem;
-  }
-
-  .legend-color {
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
-  }
-
-  .legend-text {
-    color: rgba(255, 255, 255, 0.8);
-  }
-
-  .legend-value {
-    color: rgba(255, 255, 255, 0.5);
   }
 
   /* Insights */

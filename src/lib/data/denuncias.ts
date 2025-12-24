@@ -93,10 +93,10 @@ export const denunciasPorRegion: DenunciasPorRegion[] = [
 // Denuncias por ámbito
 export const denunciasPorAmbito: DenunciasPorAmbito[] = [
   { ambito: "Convivencia", total: 9876, porcentaje: 66.1 },
-  { ambito: "Gestión Técnico-Administrativa", total: 1823, porcentaje: 12.2 },
-  { ambito: "Seguridad e Higiene", total: 1456, porcentaje: 9.8 },
+  { ambito: "Gestión Adm.", total: 1823, porcentaje: 12.2 },
+  { ambito: "Seg. e Higiene", total: 1456, porcentaje: 9.8 },
   { ambito: "Infraestructura", total: 876, porcentaje: 5.9 },
-  { ambito: "Gestión Técnico-Pedagógica", total: 534, porcentaje: 3.6 },
+  { ambito: "Gestión Pedag.", total: 534, porcentaje: 3.6 },
   { ambito: "Admisión", total: 234, porcentaje: 1.6 },
   { ambito: "Otros", total: 134, porcentaje: 0.9 },
 ];
@@ -150,10 +150,10 @@ export const resumenGeneral = {
 // Colores para los gráficos
 export const coloresAmbito: Record<string, string> = {
   "Convivencia": "#ef4444",
-  "Gestión Técnico-Administrativa": "#f97316",
-  "Seguridad e Higiene": "#eab308",
+  "Gestión Adm.": "#f97316",
+  "Seg. e Higiene": "#eab308",
   "Infraestructura": "#22c55e",
-  "Gestión Técnico-Pedagógica": "#06b6d4",
+  "Gestión Pedag.": "#06b6d4",
   "Admisión": "#8b5cf6",
   "Otros": "#6b7280",
 };
